@@ -1,10 +1,15 @@
 import { Inngest } from "inngest";
 import { connectDB } from "./db.js";
-import { User } from "@clerk/express";
+import { User } from "../models/user.model.js"
+import { ENV } from "./env.js";
 
 
 // Create a client to send and receive events
-export const inngest = new Inngest({ id: "slick" });
+export const inngest = new Inngest({ 
+    id: "slick",
+    eventKey: ENV.INNGEST_EVENT_KEY,
+    signingKey: ENV.INNGEST_SIGNING_KEY
+});
 
 const syncUser = inngest.createFunction(
     {id: "sync-user"},
@@ -29,6 +34,7 @@ const deleteUserFromDB = inngest.createFunction(
     {id: "delete-user-from-db"},
     {event: "clerk/user.deleted"},
     async ({event}) =>{
+        await connectDB();
         const {id} = event.data;
         await User.deleteOne({clerkId: id});
         //await deleteStreamUser(id.toString());
