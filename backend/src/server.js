@@ -22,6 +22,10 @@ app.use("/api/chat", chatRoutes);
 
 Sentry.setupExpressErrorHandler(app);
 
+app.get('/', (req, res) => {
+    res.send('Server is running');
+});
+
 const startServer = async() =>{
     try{
         await connectDB();
